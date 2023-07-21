@@ -1,0 +1,49 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Parser App</title>
+</head>
+<body>
+  <h1>Data Parser App</h1>
+  <label for="login-gpro">Login GPRO:</label>
+  <input type="text" id="login-gpro" placeholder="Enter login GPRO"><br>
+
+  <label for="password-gpro">Password GPRO:</label>
+  <input type="password" id="password-gpro" placeholder="Enter password GPRO"><br>
+
+  <label for="login-wrt">Login WRT:</label>
+  <input type="text" id="login-wrt" placeholder="Enter login WRT"><br>
+
+  <label for="password-wrt">Password WRT:</label>
+  <input type="password" id="password-wrt" placeholder="Enter password WRT"><br>
+
+  <button id="start-parsing">Start Parsing</button>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // Znajdź przycisk i dodaj do niego zdarzenie "click"
+    const startParsingButton = document.getElementById('start-parsing');
+    startParsingButton.addEventListener('click', () => {
+      const loginGPRO = document.getElementById('login-gpro').value;
+      const passwordGPRO = document.getElementById('password-gpro').value;
+      const loginWRT = document.getElementById('login-wrt').value;
+      const passwordWRT = document.getElementById('password-wrt').value;
+
+      // Wyślij dane do głównego procesu za pomocą ipcRenderer.send()
+      ipcRenderer.send('start-parsing', loginGPRO, passwordGPRO, loginWRT, passwordWRT);
+    });
+
+    // Nasłuchuj odpowiedzi od głównego procesu i przetwarzaj wyniki
+    ipcRenderer.on('parsing-complete', (event, dataFromPuppeteer) => {
+      console.log(dataFromPuppeteer.dataFromPage1);
+      console.log(dataFromPuppeteer.dataFromPage2);
+    });
+
+    ipcRenderer.on('parsing-error', (event, errorMessage) => {
+      console.error('Wystąpił błąd:', errorMessage);
+    });
+  </script>
+</body>
+</html>
